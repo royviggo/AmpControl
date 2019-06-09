@@ -2,7 +2,6 @@
 #define LCDDISPLAY_H
 
 #include <Arduino.h>
-#include "Display.h"
 #include <LiquidCrystal.h>
 
 class LcdDisplay
