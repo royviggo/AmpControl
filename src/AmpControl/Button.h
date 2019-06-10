@@ -5,20 +5,28 @@
 
 class Button
 {
+private:
+    static const int DEBOUNCE_LIMIT = 30;
+    static const int LONG_CLICK_LIMIT = 1000;
+
     const uint8_t pin;
     const uint8_t mode;
+    void(*normalClickFunction)(void);
+    void(*longClickFunction)(void);
+    int longClickLimitMs;
+    
+    bool useLongClick = false;
     int state;
     unsigned long buttonDownMs;
 
-// protected:
-//     virtual void shortClick() = 0;
-//     virtual void longClick() = 0;
-
-public:
-    Button(uint8_t pin, uint8_t mode);
     int getState() const;
     void setState(int state);
-    bool isPressed() const;
+    bool isButtonDown(int state) const;
+    bool isButtonDown() const;
+
+public:
+    Button(uint8_t pin, uint8_t mode, void(*normalClickFunction)());
+    Button(uint8_t pin, uint8_t mode, void(*normalClickFunction)(), void(*longClickFunction)(), int longClickLimitMs = LONG_CLICK_LIMIT);
     void check();
 };
 

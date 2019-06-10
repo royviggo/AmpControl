@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include "LcdDisplay.h"
 #include "Button.h"
 
@@ -24,18 +25,16 @@ const int AMPC_BUTTON_MODE = INPUT_PULLUP;
 LcdDisplay display = LcdDisplay(AMPC_LCD_COLS, AMPC_LCD_ROWS, AMPC_LCD_CHARSIZE);
 int counter = 0;
 
-Button leftBtn = Button(AMPC_BUTTON_LEFT, AMPC_BUTTON_MODE);
-Button rightBtn = Button(AMPC_BUTTON_RIGHT, AMPC_BUTTON_MODE);
-Button selectBtn = Button(AMPC_BUTTON_SELECT, AMPC_BUTTON_MODE);
-
-const int ledPin = 13;
+Button leftBtn = Button(AMPC_BUTTON_LEFT, AMPC_BUTTON_MODE, &leftBtnNormalClick);
+Button rightBtn = Button(AMPC_BUTTON_RIGHT, AMPC_BUTTON_MODE, &rightBtnNormalClick);
+Button selectBtn = Button(AMPC_BUTTON_SELECT, AMPC_BUTTON_MODE, &selectBtnNormalClick, &selectBtnLongClick);
 
 void setup()
 {
     display.begin(AMPC_LCD_PIN_RS, AMPC_LCD_PIN_EN, AMPC_LCD_PIN_D4, AMPC_LCD_PIN_D5, AMPC_LCD_PIN_D6, AMPC_LCD_PIN_D7);
     display.print(0, 0, "Hello world!");
 
-    pinMode(ledPin, OUTPUT);
+    Serial.begin(115200);
 }
 
 void loop()
@@ -45,6 +44,24 @@ void loop()
     leftBtn.check();
     rightBtn.check();
     selectBtn.check();
+}
 
-    digitalWrite(ledPin, leftBtn.isPressed() || rightBtn.isPressed() || selectBtn.isPressed());
+void leftBtnNormalClick()
+{
+    Serial.println("Left button normal click");
+}
+
+void rightBtnNormalClick()
+{
+    Serial.println("Right button normal click");
+}
+
+void selectBtnNormalClick()
+{
+    Serial.println("Select button normal click");
+}
+
+void selectBtnLongClick()
+{
+    Serial.println("Select button long click");
 }
