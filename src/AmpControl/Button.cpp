@@ -1,49 +1,47 @@
 #include "Button.h"
 
-Button::Button(uint8_t pin, uint8_t mode, void(*normalClickFunction)()) : pin(pin), mode(mode), normalClickFunction(normalClickFunction)
+Button::Button(uint8_t pin, bool activePin) : pin(pin), activePin(activePin)
 {
-    pinMode(pin, mode);
-    state = (mode == INPUT) ? LOW : HIGH;
+    pinMode(pin, activePin ? INPUT : INPUT_PULLUP);
+    state = NONE;
 }
 
-Button::Button(uint8_t pin, uint8_t mode, void(*normalClickFunction)(), void(*longClickFunction)(), int longClickLimitMs) 
-    : pin(pin), mode(mode), normalClickFunction(normalClickFunction), longClickFunction(longClickFunction), longClickLimitMs(longClickLimitMs)
+Button::Button(uint8_t pin, bool activePin, bool useLongClick, int longClickLimitMs)
+    : pin(pin), activePin(activePin), useLongClick(useLongClick), longClickLimitMs(longClickLimitMs)
 {
-    pinMode(pin, mode);
-    state = (mode == INPUT) ? LOW : HIGH;
-    useLongClick = true;
+    pinMode(pin, activePin ? INPUT : INPUT_PULLUP);
+    state = NONE;
 }
 
-int Button::getState() const { return state; }
-void Button::setState(int state) { this->state = state; }
-bool Button::isButtonDown() const { return isButtonDown(getState()); }
-
-bool Button::isButtonDown(int s) const
+bool Button::isButtonDown(int pinState) const
 {
-    return ((mode == INPUT && s == HIGH) ||
-            (mode == INPUT_PULLUP && s == LOW));
+    return (activePin && pinState == HIGH) || (!activePin && pinState == LOW);
 }
 
-void Button::check()
+ButtonState Button::checkState()
 {
-    bool prevButtonDown = isButtonDown();
-    setState(digitalRead(pin));
+    ButtonState prevState = state;
+    state = isButtonDown(digitalRead(pin)) 
+        ? CLICKING 
+        : prevState == CLICKING ? RELEASING : NONE;
 
-    // Start timer when we get a new click
-    if (isButtonDown() && !prevButtonDown)
+    // Start timer if we get a new click
+    if (state == CLICKING && prevState == NONE)
         buttonDownMs = millis();
 
     // TODO: Do we want to continuously register long clicks?
-    // if (isButtonDown() && useLongClick && millis() - buttonDownMs > longClickLimitMs)
-    //     longClickFunction();
+    // if (state == CLICKING && useLongClick && millis() - buttonDownMs > longClickLimitMs)
+    //     state = LONG_CLICK;
 
     // Register button clicks when the button is released
-    if (!isButtonDown() && prevButtonDown)
+    if (state == RELEASING)
     {
-        // Button is released - check how long we Clicked it
+        // Button is released - check how long we clicked it
         if (useLongClick && millis() - buttonDownMs > longClickLimitMs)
-            longClickFunction();
+            state = LONG_CLICK;
         else if (millis() - buttonDownMs > DEBOUNCE_LIMIT)
-            normalClickFunction();
+            state = NORMAL_CLICK;
     }
+
+    return state;
 }

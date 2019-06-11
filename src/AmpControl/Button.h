@@ -3,31 +3,34 @@
 
 #include <Arduino.h>
 
+enum ButtonState {
+    NONE,
+    CLICKING,
+    RELEASING,
+    NORMAL_CLICK,
+    LONG_CLICK,
+};
+
 class Button
 {
 private:
-    static const int DEBOUNCE_LIMIT = 30;
+    static const int DEBOUNCE_LIMIT = 50;
     static const int LONG_CLICK_LIMIT = 1000;
 
     const uint8_t pin;
-    const uint8_t mode;
-    void(*normalClickFunction)(void);
-    void(*longClickFunction)(void);
+    const bool activePin;
+    bool useLongClick = false;
     int longClickLimitMs;
     
-    bool useLongClick = false;
-    int state;
+    enum ButtonState state;
     unsigned long buttonDownMs;
 
-    int getState() const;
-    void setState(int state);
-    bool isButtonDown(int state) const;
-    bool isButtonDown() const;
+    bool isButtonDown(int pinState) const;
 
 public:
-    Button(uint8_t pin, uint8_t mode, void(*normalClickFunction)());
-    Button(uint8_t pin, uint8_t mode, void(*normalClickFunction)(), void(*longClickFunction)(), int longClickLimitMs = LONG_CLICK_LIMIT);
-    void check();
+    Button(uint8_t pin, bool active);
+    Button(uint8_t pin, bool active, bool useLongClick, int longClickLimitMs = LONG_CLICK_LIMIT);
+    ButtonState checkState();
 };
 
 #endif
