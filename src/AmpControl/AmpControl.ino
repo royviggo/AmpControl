@@ -46,6 +46,9 @@ void setup()
     delay(1000);
     display.print(0, 0, "Volume:         ");
     display.print(8, 0, String(encoderValue) + " ");
+
+    Serial.begin(115200);
+    Serial.println("Setup Ok");
 }
 
 void loop()
