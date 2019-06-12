@@ -12,12 +12,14 @@ EncoderState RotaryEncoder::checkState()
     int readA = digitalRead(pinA);
     int readB = digitalRead(pinB);
 
-    if (readA)
-        state = readB ? INCREASING : DECREASING;
-    else if (readB)
-        state = DECREASING;
+    // Catch movement on falling edge
+    if (readA && !prevReadA)
+        state = readB ? DECREASING : INCREASING;
     else
         state = NONMOVING;
+
+    // Hold the previous read value for pin A
+    prevReadA = readA;
 
     return state;
 }

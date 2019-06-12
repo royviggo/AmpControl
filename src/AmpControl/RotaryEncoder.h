@@ -15,6 +15,8 @@ private:
     const uint8_t pinA;
     const uint8_t pinB;
     const bool activePins;
+
+    int prevReadA = 0;
     enum EncoderState state;
 
 public:

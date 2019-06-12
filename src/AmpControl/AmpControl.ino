@@ -42,12 +42,10 @@ uint8_t encoderValue = 0;
 void setup()
 {
     display.begin(AMPC_LCD_PIN_RS, AMPC_LCD_PIN_EN, AMPC_LCD_PIN_D4, AMPC_LCD_PIN_D5, AMPC_LCD_PIN_D6, AMPC_LCD_PIN_D7);
-    display.print(0, 0, "Hello world!");
+    display.print(0, 0, "AmpControl");
     delay(1000);
     display.print(0, 0, "Volume:         ");
-
-    Serial.begin(115200);
-    Serial.println("Setup Ok");
+    display.print(8, 0, String(encoderValue) + " ");
 }
 
 void loop()
@@ -61,7 +59,7 @@ void loop()
         encoderValue--;
     
     if (encoderValue != prevEncoderValue)
-        display.print(8, 0, String(encoderValue));
+        display.print(8, 0, String(encoderValue) + " ");
 
     ButtonState leftBtnState = leftBtn.checkState();
     if (leftBtnState == NORMAL_CLICK)
