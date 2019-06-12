@@ -4,7 +4,7 @@
 #include <Arduino.h>
 
 enum ButtonState {
-    NONE,
+    NONCLICK,
     CLICKING,
     RELEASING,
     NORMAL_CLICK,

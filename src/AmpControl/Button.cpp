@@ -3,14 +3,14 @@
 Button::Button(uint8_t pin, bool activePin) : pin(pin), activePin(activePin)
 {
     pinMode(pin, activePin ? INPUT : INPUT_PULLUP);
-    state = NONE;
+    state = NONCLICK;
 }
 
 Button::Button(uint8_t pin, bool activePin, bool useLongClick, int longClickLimitMs)
     : pin(pin), activePin(activePin), useLongClick(useLongClick), longClickLimitMs(longClickLimitMs)
 {
     pinMode(pin, activePin ? INPUT : INPUT_PULLUP);
-    state = NONE;
+    state = NONCLICK;
 }
 
 bool Button::isButtonDown(int pinState) const
@@ -23,10 +23,10 @@ ButtonState Button::checkState()
     ButtonState prevState = state;
     state = isButtonDown(digitalRead(pin)) 
         ? CLICKING 
-        : prevState == CLICKING ? RELEASING : NONE;
+        : prevState == CLICKING ? RELEASING : NONCLICK;
 
     // Start timer if we get a new click
-    if (state == CLICKING && prevState == NONE)
+    if (state == CLICKING && prevState == NONCLICK)
         buttonDownMs = millis();
 
     // TODO: Do we want to continuously register long clicks?

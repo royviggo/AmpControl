@@ -17,7 +17,7 @@ EncoderState RotaryEncoder::checkState()
     else if (readB)
         state = DECREASING;
     else
-        state = NONE;
+        state = NONMOVING;
 
     return state;
 }

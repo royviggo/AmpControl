@@ -4,7 +4,7 @@
 #include <Arduino.h>
 
 enum EncoderState {
-    NONE,
+    NONMOVING,
     INCREASING,
     DECREASING,
 };
