@@ -2,6 +2,7 @@
 #include "LcdDisplay.h"
 #include "Button.h"
 #include "RotaryEncoder.h"
+#include "Pga23xx.h"
 
 // Setup for the LCD display
 const int AMPC_LCD_COLS = 16;
@@ -28,6 +29,11 @@ const int AMPC_ENCODER_PINA = 5;
 const int AMPC_ENCODER_PINB = 6;
 const int AMPC_ENCODER_ACTIVE_PINS = false;
 
+// Volume control
+const int AMPC_VOLUME_PIN_SS = PIN_A0;
+const int AMPC_VOLUME_PIN_SCK = PIN_A1;
+const int AMPC_VOLUME_PIN_MOSI = PIN_A2;
+
 // Global variables
 LcdDisplay display = LcdDisplay(AMPC_LCD_COLS, AMPC_LCD_ROWS, AMPC_LCD_CHARSIZE);
 
@@ -36,6 +42,8 @@ Button rightBtn = Button(AMPC_BUTTON_RIGHT, AMPC_BUTTON_ACTIVE_PINS);
 Button selectBtn = Button(AMPC_BUTTON_SELECT, AMPC_BUTTON_ACTIVE_PINS, AMPC_BUTTON_SELECT_LONG);
 
 RotaryEncoder encoder = RotaryEncoder(AMPC_ENCODER_PINA, AMPC_ENCODER_PINB, AMPC_ENCODER_ACTIVE_PINS);
+
+Pga23xx volume = Pga23xx(AMPC_VOLUME_PIN_SS, AMPC_VOLUME_PIN_SCK, AMPC_VOLUME_PIN_MOSI);
 
 uint8_t encoderValue = 0;
 
@@ -56,32 +64,16 @@ void loop()
     uint8_t prevEncoderValue = encoderValue;
 
     EncoderState encoderState = encoder.checkState();
-    if (encoderState == INCREASING && encoderValue < 99)
+    if (encoderState == INCREASING && encoderValue < 192)
         encoderValue++;
     if (encoderState == DECREASING && encoderValue > 0)
         encoderValue--;
     
     if (encoderValue != prevEncoderValue)
-        display.print(8, 0, String(encoderValue) + " ");
-
-    ButtonState leftBtnState = leftBtn.checkState();
-    if (leftBtnState == NORMAL_CLICK)
-        display.print(0, 1, "leftBtn!        ");
-
-    ButtonState rightBtnState = rightBtn.checkState();
-    if (rightBtnState == NORMAL_CLICK)
-        display.print(0, 1, "rightBtn!       ");
-
-    ButtonState selectBtnState = selectBtn.checkState();
-    if (selectBtnState == NORMAL_CLICK)
-        display.print(0, 1, "selectBtn!      ");
-    if (selectBtnState == LONG_CLICK)
-        display.print(0, 1, "selectBtn LONG! ");
-
-    if (leftBtnState == NORMAL_CLICK || rightBtnState == NORMAL_CLICK ||
-        selectBtnState == NORMAL_CLICK || selectBtnState == LONG_CLICK)
     {
-        delay(800);
-        display.print(0, 1, "                ");
+        display.print(8, 0, String(encoderValue) + " ");
+        volume.setVolume(encoderValue);
+        Serial.print("Volume: ");
+        Serial.println(encoderValue);
     }
 }
