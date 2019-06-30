@@ -2,6 +2,7 @@
 #include "LcdDisplay.h"
 #include "Button.h"
 #include "RotaryEncoder.h"
+#include "VolumeControl.h"
 #include "Pga23xx.h"
 
 // Setup for the LCD display
@@ -10,12 +11,12 @@ const int AMPC_LCD_ROWS = 2;
 const int AMPC_LCD_CHARSIZE = 0;
 
 // Arduino pins for the LCD display
-const int AMPC_LCD_PIN_RS = 7;
-const int AMPC_LCD_PIN_EN = 8;
-const int AMPC_LCD_PIN_D4 = 9;
-const int AMPC_LCD_PIN_D5 = 10;
-const int AMPC_LCD_PIN_D6 = 11;
-const int AMPC_LCD_PIN_D7 = 12;
+const int AMPC_LCD_PIN_RS = PIN_A5;
+const int AMPC_LCD_PIN_EN = PIN_A4;
+const int AMPC_LCD_PIN_D4 = PIN_A3;
+const int AMPC_LCD_PIN_D5 = PIN_A2;
+const int AMPC_LCD_PIN_D6 = PIN_A1;
+const int AMPC_LCD_PIN_D7 = PIN_A0;
 
 // Button pins
 const int AMPC_BUTTON_LEFT = 2;
@@ -25,14 +26,19 @@ const int AMPC_BUTTON_SELECT_LONG = true;
 const int AMPC_BUTTON_ACTIVE_PINS = false;
 
 // Rotary encoder
-const int AMPC_ENCODER_PINA = 5;
-const int AMPC_ENCODER_PINB = 6;
+const int AMPC_ENCODER_PINA = PIN5;
+const int AMPC_ENCODER_PINB = PIN6;
 const int AMPC_ENCODER_ACTIVE_PINS = false;
 
 // Volume control
-const int AMPC_VOLUME_PIN_SS = PIN_A0;
-const int AMPC_VOLUME_PIN_SCK = PIN_A1;
-const int AMPC_VOLUME_PIN_MOSI = PIN_A2;
+const int AMPC_VOLUME_PIN_SS = PIN_SPI_SS;
+const int AMPC_VOLUME_PIN_SCK = PIN_SPI_SCK;
+const int AMPC_VOLUME_PIN_MOSI = PIN_SPI_MOSI;
+const int AMPC_VOLUME_CHANNELS = 2;
+const float AMPC_VOLUME_MIN_VOLUME = 0;
+const float AMPC_VOLUME_MAX_VOLUME = 96;
+const float AMPC_VOLUME_CHANGE_BY = 0.5;
+
 
 // Global variables
 LcdDisplay display = LcdDisplay(AMPC_LCD_COLS, AMPC_LCD_ROWS, AMPC_LCD_CHARSIZE);
@@ -43,37 +49,44 @@ Button selectBtn = Button(AMPC_BUTTON_SELECT, AMPC_BUTTON_ACTIVE_PINS, AMPC_BUTT
 
 RotaryEncoder encoder = RotaryEncoder(AMPC_ENCODER_PINA, AMPC_ENCODER_PINB, AMPC_ENCODER_ACTIVE_PINS);
 
-Pga23xx volume = Pga23xx(AMPC_VOLUME_PIN_SS, AMPC_VOLUME_PIN_SCK, AMPC_VOLUME_PIN_MOSI);
+VolumeControl volume = VolumeControl(AMPC_VOLUME_MIN_VOLUME, AMPC_VOLUME_MAX_VOLUME, AMPC_VOLUME_CHANGE_BY);
+Pga23xx pgaVolume = Pga23xx(AMPC_VOLUME_PIN_SS, AMPC_VOLUME_PIN_SCK, AMPC_VOLUME_PIN_MOSI, "Bass");
 
-uint8_t encoderValue = 0;
+float prevVolumeLevel = 0;
 
 void setup()
 {
+    volume.begin(&pgaVolume);
+    volume.setBalance(3);
+
     display.begin(AMPC_LCD_PIN_RS, AMPC_LCD_PIN_EN, AMPC_LCD_PIN_D4, AMPC_LCD_PIN_D5, AMPC_LCD_PIN_D6, AMPC_LCD_PIN_D7);
     display.print(0, 0, "AmpControl");
     delay(1000);
     display.print(0, 0, "Volume:         ");
-    display.print(8, 0, String(encoderValue) + " ");
+    display.print(8, 0, String(volume.getVolume()) + " ");
 
     Serial.begin(115200);
     Serial.println("Setup Ok");
+    Serial.print("Initial Volume: ");
+    Serial.println(volume.getVolume());
 }
 
 void loop()
 {
-    uint8_t prevEncoderValue = encoderValue;
+    prevVolumeLevel = volume.getVolume();
 
     EncoderState encoderState = encoder.checkState();
-    if (encoderState == INCREASING && encoderValue < 192)
-        encoderValue++;
-    if (encoderState == DECREASING && encoderValue > 0)
-        encoderValue--;
+    if (encoderState == INCREASING)
+        volume.increase();
+    if (encoderState == DECREASING)
+        volume.decrease();
     
-    if (encoderValue != prevEncoderValue)
+    if (volume.getVolume() != prevVolumeLevel)
     {
-        display.print(8, 0, String(encoderValue) + " ");
-        volume.setVolume(encoderValue);
+        display.print(8, 0, String(volume.getVolume()) + " ");
         Serial.print("Volume: ");
-        Serial.println(encoderValue);
+        Serial.print(volume.getVolume());
+        Serial.print("  Balance: ");
+        Serial.println(volume.getBalance());
     }
 }
