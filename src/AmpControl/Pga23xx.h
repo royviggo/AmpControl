@@ -1,9 +1,9 @@
 #ifndef PGA23XX_H
 #define PGA23XX_H
 
-#include "VolumeControl.h"
+#include "StereoVolume.h"
 
-class Pga23xx : public VolumeControl
+class Pga23xx : public StereoVolume
 {
 private:
     const int pinSS;    // SPI: CS
@@ -13,10 +13,13 @@ private:
     const int MIN_VOLUME = 0;
     const int MAX_VOLUME = 192;
 
+    void initialize(int pin);
+    int mapVolume(float level, float offset);
+
 public:
     Pga23xx(int pinSS, int pinSCK, int pinMOSI);
-    void setVolume(int levelLeft, int levelRight);
-    void setVolume(int level);
+    Pga23xx(int pinSS, int pinSCK, int pinMOSI, String name);
+    void setVolume(float levelLeft, float levelRight);
 };
 
 #endif
