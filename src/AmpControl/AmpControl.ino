@@ -91,7 +91,7 @@ void loop()
         display.print(8, 0, String(volume.getVolume()) + " ");
         Serial.print("Volume: ");
         Serial.print(volume.getVolumeNumber());
-        Serial.print(" dB - Balance: ");
+        Serial.print(" - Balance: ");
         Serial.print(volume.getBalance());
         Serial.println(volume.isMuted() ? "  --Muted--" : "");
     }
