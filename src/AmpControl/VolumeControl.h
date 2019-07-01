@@ -6,26 +6,26 @@
 class VolumeControl
 {
 private:
-    const float MIN_VOLUME = 0.0;
-    const float MAX_VOLUME = 96.0;
-    const float VOLUME_CHANGE = 0.5;
+    const int MIN_VOLUME = 0;
+    const int MAX_VOLUME = 192;
+    const int VOLUME_CHANGE = 1;
 
     int numberOfControls;
-    float minVolume;
-    float maxVolume;
-    float volumeChange;
+    int minVolume;
+    int maxVolume;
+    int volumeChange;
 
-    float volumeLevel;
-    float balanceLevel;
+    int volumeLevel;
+    int balanceLevel;
 
     StereoVolume* volume[6];
 
-    float getRightLevel();
-    float getLeftLevel();
+    int getRightLevel();
+    int getLeftLevel();
 
 public:
     VolumeControl();
-    VolumeControl(const float minVolume, const float maxVolume, const float volumeChange);
+    VolumeControl(const int minVolume, const int maxVolume, const int volumeChange);
 
     void begin(StereoVolume* volume1);
     void begin(StereoVolume* volume1, StereoVolume* volume2);
@@ -34,16 +34,16 @@ public:
     void begin(StereoVolume* volume1, StereoVolume* volume2, StereoVolume* volume3, StereoVolume* volume4, StereoVolume* volume5);
     void begin(StereoVolume* volume1, StereoVolume* volume2, StereoVolume* volume3, StereoVolume* volume4, StereoVolume* volume5, StereoVolume* volume6);
 
-    float getMinVolume() const;
-    float getMaxVolume() const;
+    int getMinVolume() const;
+    int getMaxVolume() const;
     int getNumberOfControls() const;
 
-    float getVolume();
-    void setVolume(float level);
-    float setGetVolume(float level);
+    int getVolume();
+    void setVolume(int level);
+    int setGetVolume(int level);
 
-    float getBalance();
-    void setBalance(float level);
+    int getBalance();
+    void setBalance(int level);
 
     void increase();
     void decrease();

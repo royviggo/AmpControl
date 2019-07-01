@@ -11,7 +11,7 @@ VolumeControl::VolumeControl()
     setBalance(0);
 }
 
-VolumeControl::VolumeControl(const float minVolume, const float maxVolume, const float volumeChange)
+VolumeControl::VolumeControl(const int minVolume, const int maxVolume, const int volumeChange)
     : numberOfControls(numberOfControls), minVolume(minVolume), maxVolume(maxVolume), volumeChange(volumeChange) {}
 
 void VolumeControl::begin(StereoVolume *volume1)
@@ -65,13 +65,13 @@ void VolumeControl::begin(StereoVolume *volume1, StereoVolume *volume2, StereoVo
     volume[5] = volume6;
 }
 
-float VolumeControl::getMinVolume() const { return minVolume; }
-float VolumeControl::getMaxVolume() const { return maxVolume; }
+int VolumeControl::getMinVolume() const { return minVolume; }
+int VolumeControl::getMaxVolume() const { return maxVolume; }
 int VolumeControl::getNumberOfControls() const { return numberOfControls; }
 
-float VolumeControl::getVolume() { return volumeLevel; }
+int VolumeControl::getVolume() { return volumeLevel; }
 
-void VolumeControl::setVolume(float level)
+void VolumeControl::setVolume(int level)
 {
     volumeLevel = level >= getMinVolume() && level <= getMaxVolume()
         ? level
@@ -81,29 +81,29 @@ void VolumeControl::setVolume(float level)
         volume[i]->setVolume(getLeftLevel(), getRightLevel());
 }
 
-float VolumeControl::setGetVolume(float level)
+int VolumeControl::setGetVolume(int level)
 {
     setVolume(level);
     return getVolume();
 }
 
-float VolumeControl::getBalance() { return balanceLevel; }
+int VolumeControl::getBalance() { return balanceLevel; }
 
-void VolumeControl::setBalance(float level)
+void VolumeControl::setBalance(int level)
 {
     balanceLevel = level >= (0 - getMaxVolume()) && level <= getMaxVolume()
         ? level
         : level < (0 - getMaxVolume()) ? 0 - getMaxVolume() : getMaxVolume();
 }
 
-float VolumeControl::getRightLevel()
+int VolumeControl::getRightLevel()
 {
     return getBalance() < 0 
         ? getVolume() + getBalance() > getMinVolume() ? getVolume() + getBalance() : getMinVolume()
         : getVolume();
 }
 
-float VolumeControl::getLeftLevel()
+int VolumeControl::getLeftLevel()
 {
     return getBalance() > 0 
         ? getVolume() - getBalance() > getMinVolume() ? getVolume() - getBalance() : getMinVolume()

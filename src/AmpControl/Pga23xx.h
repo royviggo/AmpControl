@@ -14,12 +14,12 @@ private:
     const int MAX_VOLUME = 192;
 
     void initialize(int pin);
-    int mapVolume(float level, float offset);
+    int mapVolume(int level, int offset);
 
 public:
     Pga23xx(int pinSS, int pinSCK, int pinMOSI);
     Pga23xx(int pinSS, int pinSCK, int pinMOSI, String name);
-    void setVolume(float levelLeft, float levelRight);
+    void setVolume(int levelLeft, int levelRight);
 };
 
 #endif

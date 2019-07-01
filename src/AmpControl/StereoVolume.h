@@ -8,19 +8,19 @@ class StereoVolume
 private:
     const String DEFAULT_NAME = "Stereo";
     String name;
-    float offsetLeft;
-    float offsetRight;
+    int offsetLeft;
+    int offsetRight;
 
 protected:
     void setName(String name);
-    float getOffsetLeft();
-    float getOffsetRight();
+    int getOffsetLeft();
+    int getOffsetRight();
 
 public:
     StereoVolume();
     virtual ~StereoVolume();
-    virtual void setVolume(float levelLeft, float levelRight) = 0;
-    void setOffset(float offsetLeft, float offsetRight);
+    virtual void setVolume(int levelLeft, int levelRight) = 0;
+    void setOffset(int offsetLeft, int offsetRight);
     String getName();
 };
 

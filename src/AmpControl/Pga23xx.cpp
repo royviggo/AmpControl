@@ -12,7 +12,7 @@ Pga23xx::Pga23xx(int pinSS, int pinSCK, int pinMOSI, String name) : pinSS(pinSS)
     initialize(pinSS);
 }
 
-void Pga23xx::setVolume(float levelLeft, float levelRight)
+void Pga23xx::setVolume(int levelLeft, int levelRight)
 {
     digitalWrite(pinSS, LOW);
     SPI.transfer(mapVolume(levelLeft, getOffsetLeft())); // right channel
@@ -20,7 +20,7 @@ void Pga23xx::setVolume(float levelLeft, float levelRight)
     digitalWrite(pinSS, HIGH);
 }
 
-int Pga23xx::mapVolume(float level, float offset)
+int Pga23xx::mapVolume(int level, int offset)
 {
     int mappedLevel = int(round((level * 2) + offset));
 

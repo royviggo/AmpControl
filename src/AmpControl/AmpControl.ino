@@ -35,9 +35,9 @@ const int AMPC_VOLUME_PIN_SS = PIN_SPI_SS;
 const int AMPC_VOLUME_PIN_SCK = PIN_SPI_SCK;
 const int AMPC_VOLUME_PIN_MOSI = PIN_SPI_MOSI;
 const int AMPC_VOLUME_CHANNELS = 2;
-const float AMPC_VOLUME_MIN_VOLUME = 0;
-const float AMPC_VOLUME_MAX_VOLUME = 96;
-const float AMPC_VOLUME_CHANGE_BY = 0.5;
+const int AMPC_VOLUME_MIN_VOLUME = 0;
+const int AMPC_VOLUME_MAX_VOLUME = 192;
+const int AMPC_VOLUME_CHANGE_BY = 1;
 
 
 // Global variables
