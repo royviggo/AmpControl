@@ -7,7 +7,7 @@ class VolumeControl
 {
 private:
     const int MIN_VOLUME = 0;
-    const int MAX_VOLUME = 192;
+    const int MAX_VOLUME = 255;
     const int VOLUME_CHANGE = 1;
 
     int numberOfControls;
@@ -24,9 +24,14 @@ private:
     int getRightLevel();
     int getLeftLevel();
 
+    bool useConverter;
+    float(*convertNumberFunction)(int);
+    float(*convertDbFunction)(int);
+
 public:
     VolumeControl();
     VolumeControl(const int minVolume, const int maxVolume, const int volumeChange);
+    VolumeControl(const int minVolume, const int maxVolume, const int volumeChange, float(*convertNumberFunction)(int), float(*convertDbFunction)(int));
 
     void begin(StereoVolume* volume1);
     void begin(StereoVolume* volume1, StereoVolume* volume2);
@@ -42,6 +47,9 @@ public:
     int getVolume();
     void setVolume(int level);
     int setGetVolume(int level);
+
+    float getVolumeNumber();
+    float getVolumeDb();
 
     int getBalance();
     void setBalance(int level);

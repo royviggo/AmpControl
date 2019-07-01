@@ -49,16 +49,16 @@ Button selectBtn = Button(AMPC_BUTTON_SELECT, AMPC_BUTTON_ACTIVE_PINS, AMPC_BUTT
 Button muteBtn = Button(AMPC_BUTTON_MUTE, AMPC_BUTTON_ACTIVE_PINS);
 RotaryEncoder encoder = RotaryEncoder(AMPC_ENCODER_PINA, AMPC_ENCODER_PINB, AMPC_ENCODER_ACTIVE_PINS);
 
-VolumeControl volume = VolumeControl(AMPC_VOLUME_MIN_VOLUME, AMPC_VOLUME_MAX_VOLUME, AMPC_VOLUME_CHANGE_BY);
+VolumeControl volume = VolumeControl(AMPC_VOLUME_MIN_VOLUME, AMPC_VOLUME_MAX_VOLUME, AMPC_VOLUME_CHANGE_BY, &convertVolumeToNumber, &convertVolumeToDb);
 Pga23xx pgaVolume = Pga23xx(AMPC_VOLUME_PIN_SS, AMPC_VOLUME_PIN_SCK, AMPC_VOLUME_PIN_MOSI, "Bass");
 
-int prevVolumeLevel = 0;
+float prevVolumeLevel = 0;
 int prevMute;
 
 void setup()
 {
     volume.begin(&pgaVolume);
-    volume.setBalance(3);
+    volume.setBalance(0);
 
     display.begin(AMPC_LCD_PIN_RS, AMPC_LCD_PIN_EN, AMPC_LCD_PIN_D4, AMPC_LCD_PIN_D5, AMPC_LCD_PIN_D6, AMPC_LCD_PIN_D7);
     display.print(0, 0, "AmpControl");
@@ -69,12 +69,12 @@ void setup()
     Serial.begin(115200);
     Serial.println("Setup Ok");
     Serial.print("Initial Volume: ");
-    Serial.println(volume.getVolume());
+    Serial.println(volume.getVolumeNumber());
 }
 
 void loop()
 {
-    prevVolumeLevel = volume.getVolume();
+    prevVolumeLevel = volume.getVolumeNumber();
     prevMute = volume.isMuted();
 
     EncoderState encoderState = encoder.checkState();
@@ -86,13 +86,23 @@ void loop()
     if (muteBtn.checkState() == NORMAL_CLICK)
         volume.flipMute();
 
-    if (volume.getVolume() != prevVolumeLevel || volume.isMuted() != prevMute)
+    if (volume.getVolumeNumber() != prevVolumeLevel || volume.isMuted() != prevMute)
     {
         display.print(8, 0, String(volume.getVolume()) + " ");
         Serial.print("Volume: ");
-        Serial.print(volume.getVolume());
-        Serial.print("  Balance: ");
+        Serial.print(volume.getVolumeNumber());
+        Serial.print(" dB - Balance: ");
         Serial.print(volume.getBalance());
-        Serial.println(volume.isMuted() ? "  Muted" : "");
+        Serial.println(volume.isMuted() ? "  --Muted--" : "");
     }
+}
+
+float convertVolumeToNumber(int level)
+{
+    return (float)level / 2.0;
+}
+
+float convertVolumeToDb(int level)
+{
+    return (float)(level - 192.0) / 2.0;
 }

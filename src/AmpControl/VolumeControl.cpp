@@ -7,13 +7,24 @@ VolumeControl::VolumeControl()
     maxVolume = MAX_VOLUME;
     volumeChange = VOLUME_CHANGE;
 
+    useConverter = false;
     muted = false;
     setVolume(0);
     setBalance(0);
 }
 
 VolumeControl::VolumeControl(const int minVolume, const int maxVolume, const int volumeChange)
-    : numberOfControls(numberOfControls), minVolume(minVolume), maxVolume(maxVolume), volumeChange(volumeChange) {}
+    : numberOfControls(numberOfControls), minVolume(minVolume), maxVolume(maxVolume), volumeChange(volumeChange)
+{
+    useConverter = false;
+}
+
+VolumeControl::VolumeControl(const int minVolume, const int maxVolume, const int volumeChange, float (*convertNumberFunction)(int), float (*convertDbFunction)(int))
+    : numberOfControls(numberOfControls), minVolume(minVolume), maxVolume(maxVolume), volumeChange(volumeChange), 
+      convertNumberFunction(convertNumberFunction), convertDbFunction(convertDbFunction)
+{
+    useConverter = true;
+}
 
 void VolumeControl::begin(StereoVolume *volume1)
 {
@@ -75,8 +86,8 @@ int VolumeControl::getVolume() { return volumeLevel; }
 void VolumeControl::setVolume(int level)
 {
     volumeLevel = level >= getMinVolume() && level <= getMaxVolume()
-        ? level
-        : level < getMinVolume() ? getMinVolume() : getMaxVolume();
+                      ? level
+                      : level < getMinVolume() ? getMinVolume() : getMaxVolume();
 
     for (byte i; i < getNumberOfControls(); i++)
         volume[i]->setVolume(getLeftLevel(), getRightLevel());
@@ -93,22 +104,22 @@ int VolumeControl::getBalance() { return balanceLevel; }
 void VolumeControl::setBalance(int level)
 {
     balanceLevel = level >= (0 - getMaxVolume()) && level <= getMaxVolume()
-        ? level
-        : level < (0 - getMaxVolume()) ? 0 - getMaxVolume() : getMaxVolume();
+                       ? level
+                       : level < (0 - getMaxVolume()) ? 0 - getMaxVolume() : getMaxVolume();
 }
 
 int VolumeControl::getRightLevel()
 {
-    return getBalance() < 0 
-        ? getVolume() + getBalance() > getMinVolume() ? getVolume() + getBalance() : getMinVolume()
-        : getVolume();
+    return getBalance() < 0
+               ? getVolume() + getBalance() > getMinVolume() ? getVolume() + getBalance() : getMinVolume()
+               : getVolume();
 }
 
 int VolumeControl::getLeftLevel()
 {
-    return getBalance() > 0 
-        ? getVolume() - getBalance() > getMinVolume() ? getVolume() - getBalance() : getMinVolume()
-        : getVolume();
+    return getBalance() > 0
+               ? getVolume() - getBalance() > getMinVolume() ? getVolume() - getBalance() : getMinVolume()
+               : getVolume();
 }
 
 void VolumeControl::increase()
@@ -136,3 +147,13 @@ void VolumeControl::unmute()
 
 void VolumeControl::flipMute() { isMuted() ? unmute() : mute(); }
 bool VolumeControl::isMuted() { return muted; }
+
+float VolumeControl::getVolumeNumber()
+{
+    return useConverter ? convertNumberFunction(getVolume()) : getVolume();
+}
+
+float VolumeControl::getVolumeDb()
+{
+    return useConverter ? convertDbFunction(getVolume()) : getVolume();
+}
