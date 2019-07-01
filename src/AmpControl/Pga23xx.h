@@ -12,6 +12,7 @@ private:
 
     const int MIN_VOLUME = 0;
     const int MAX_VOLUME = 192;
+    const int MUTE_VOLUME = 0;
 
     void initialize(int pin);
     int mapVolume(int level, int offset);
@@ -20,6 +21,7 @@ public:
     Pga23xx(int pinSS, int pinSCK, int pinMOSI);
     Pga23xx(int pinSS, int pinSCK, int pinMOSI, String name);
     void setVolume(int levelLeft, int levelRight);
+    void mute();
 };
 
 #endif

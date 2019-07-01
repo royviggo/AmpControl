@@ -20,6 +20,11 @@ void Pga23xx::setVolume(int levelLeft, int levelRight)
     digitalWrite(pinSS, HIGH);
 }
 
+void Pga23xx::mute()
+{
+    setVolume(MUTE_VOLUME, MUTE_VOLUME);
+}
+
 int Pga23xx::mapVolume(int level, int offset)
 {
     int mappedLevel = int(round((level * 2) + offset));

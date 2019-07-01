@@ -20,6 +20,8 @@ public:
     StereoVolume();
     virtual ~StereoVolume();
     virtual void setVolume(int levelLeft, int levelRight) = 0;
+    virtual void mute() = 0;
+
     void setOffset(int offsetLeft, int offsetRight);
     String getName();
 };

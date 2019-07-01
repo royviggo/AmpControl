@@ -7,6 +7,7 @@ VolumeControl::VolumeControl()
     maxVolume = MAX_VOLUME;
     volumeChange = VOLUME_CHANGE;
 
+    muted = false;
     setVolume(0);
     setBalance(0);
 }
@@ -119,3 +120,19 @@ void VolumeControl::decrease()
 {
     setVolume(getVolume() - volumeChange);
 }
+
+void VolumeControl::mute()
+{
+    muted = true;
+    for (byte i; i < getNumberOfControls(); i++)
+        volume[i]->mute();
+}
+
+void VolumeControl::unmute()
+{
+    muted = false;
+    setVolume(getVolume());
+}
+
+void VolumeControl::flipMute() { isMuted() ? unmute() : mute(); }
+bool VolumeControl::isMuted() { return muted; }

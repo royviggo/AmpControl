@@ -34,11 +34,10 @@ const int AMPC_ENCODER_ACTIVE_PINS = false;
 const int AMPC_VOLUME_PIN_SS = PIN_SPI_SS;
 const int AMPC_VOLUME_PIN_SCK = PIN_SPI_SCK;
 const int AMPC_VOLUME_PIN_MOSI = PIN_SPI_MOSI;
-const int AMPC_VOLUME_CHANNELS = 2;
 const int AMPC_VOLUME_MIN_VOLUME = 0;
 const int AMPC_VOLUME_MAX_VOLUME = 192;
 const int AMPC_VOLUME_CHANGE_BY = 1;
-
+const int AMPC_BUTTON_MUTE = PIN7;
 
 // Global variables
 LcdDisplay display = LcdDisplay(AMPC_LCD_COLS, AMPC_LCD_ROWS, AMPC_LCD_CHARSIZE);
@@ -47,12 +46,14 @@ Button leftBtn = Button(AMPC_BUTTON_LEFT, AMPC_BUTTON_ACTIVE_PINS);
 Button rightBtn = Button(AMPC_BUTTON_RIGHT, AMPC_BUTTON_ACTIVE_PINS);
 Button selectBtn = Button(AMPC_BUTTON_SELECT, AMPC_BUTTON_ACTIVE_PINS, AMPC_BUTTON_SELECT_LONG);
 
+Button muteBtn = Button(AMPC_BUTTON_MUTE, AMPC_BUTTON_ACTIVE_PINS);
 RotaryEncoder encoder = RotaryEncoder(AMPC_ENCODER_PINA, AMPC_ENCODER_PINB, AMPC_ENCODER_ACTIVE_PINS);
 
 VolumeControl volume = VolumeControl(AMPC_VOLUME_MIN_VOLUME, AMPC_VOLUME_MAX_VOLUME, AMPC_VOLUME_CHANGE_BY);
 Pga23xx pgaVolume = Pga23xx(AMPC_VOLUME_PIN_SS, AMPC_VOLUME_PIN_SCK, AMPC_VOLUME_PIN_MOSI, "Bass");
 
-float prevVolumeLevel = 0;
+int prevVolumeLevel = 0;
+int prevMute;
 
 void setup()
 {
@@ -74,6 +75,7 @@ void setup()
 void loop()
 {
     prevVolumeLevel = volume.getVolume();
+    prevMute = volume.isMuted();
 
     EncoderState encoderState = encoder.checkState();
     if (encoderState == INCREASING)
@@ -81,12 +83,16 @@ void loop()
     if (encoderState == DECREASING)
         volume.decrease();
     
-    if (volume.getVolume() != prevVolumeLevel)
+    if (muteBtn.checkState() == NORMAL_CLICK)
+        volume.flipMute();
+
+    if (volume.getVolume() != prevVolumeLevel || volume.isMuted() != prevMute)
     {
         display.print(8, 0, String(volume.getVolume()) + " ");
         Serial.print("Volume: ");
         Serial.print(volume.getVolume());
         Serial.print("  Balance: ");
-        Serial.println(volume.getBalance());
+        Serial.print(volume.getBalance());
+        Serial.println(volume.isMuted() ? "  Muted" : "");
     }
 }

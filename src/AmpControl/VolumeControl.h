@@ -17,6 +17,7 @@ private:
 
     int volumeLevel;
     int balanceLevel;
+    bool muted;
 
     StereoVolume* volume[6];
 
@@ -47,6 +48,11 @@ public:
 
     void increase();
     void decrease();
+
+    void mute();
+    void unmute();
+    void flipMute();
+    bool isMuted();
 };
 
 #endif
