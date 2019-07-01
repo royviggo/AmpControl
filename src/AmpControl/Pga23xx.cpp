@@ -27,7 +27,7 @@ void Pga23xx::mute()
 
 int Pga23xx::mapVolume(int level, int offset)
 {
-    int mappedLevel = int(round((level * 2) + offset));
+    int mappedLevel = level + offset;
 
     if (mappedLevel < MIN_VOLUME)
         return MIN_VOLUME;
