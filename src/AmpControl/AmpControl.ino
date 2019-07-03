@@ -49,7 +49,7 @@ Button selectBtn = Button(AMPC_BUTTON_SELECT, AMPC_BUTTON_ACTIVE_PINS, AMPC_BUTT
 Button muteBtn = Button(AMPC_BUTTON_MUTE, AMPC_BUTTON_ACTIVE_PINS);
 RotaryEncoder encoder = RotaryEncoder(AMPC_ENCODER_PINA, AMPC_ENCODER_PINB, AMPC_ENCODER_ACTIVE_PINS);
 
-VolumeControl volume = VolumeControl(AMPC_VOLUME_MIN_VOLUME, AMPC_VOLUME_MAX_VOLUME, AMPC_VOLUME_CHANGE_BY, &convertVolumeToNumber, &convertVolumeToDb);
+VolumeControl volume = VolumeControl(AMPC_VOLUME_MIN_VOLUME, AMPC_VOLUME_MAX_VOLUME, AMPC_VOLUME_CHANGE_BY, &convertVolumeToNumber);
 Pga23xx pgaVolume = Pga23xx(AMPC_VOLUME_PIN_SS, AMPC_VOLUME_PIN_SCK, AMPC_VOLUME_PIN_MOSI, "Bass");
 
 float prevVolumeLevel = 0;
@@ -69,12 +69,12 @@ void setup()
     Serial.begin(115200);
     Serial.println("Setup Ok");
     Serial.print("Initial Volume: ");
-    Serial.println(volume.getVolumeNumber());
+    Serial.println(volume.getVolumeView());
 }
 
 void loop()
 {
-    prevVolumeLevel = volume.getVolumeNumber();
+    prevVolumeLevel = volume.getVolumeView();
     prevMute = volume.isMuted();
 
     EncoderState encoderState = encoder.checkState();
@@ -86,11 +86,11 @@ void loop()
     if (muteBtn.checkState() == NORMAL_CLICK)
         volume.flipMute();
 
-    if (volume.getVolumeNumber() != prevVolumeLevel || volume.isMuted() != prevMute)
+    if (volume.getVolumeView() != prevVolumeLevel || volume.isMuted() != prevMute)
     {
         display.print(8, 0, String(volume.getVolume()) + " ");
         Serial.print("Volume: ");
-        Serial.print(volume.getVolumeNumber());
+        Serial.print(volume.getVolumeView());
         Serial.print(" - Balance: ");
         Serial.print(volume.getBalance());
         Serial.println(volume.isMuted() ? "  --Muted--" : "");

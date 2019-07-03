@@ -2,11 +2,10 @@
 
 VolumeControl::VolumeControl()
 {
-    numberOfControls = 2;
+    numberOfControls = 1;
     minVolume = MIN_VOLUME;
     maxVolume = MAX_VOLUME;
     volumeChange = VOLUME_CHANGE;
-
     useConverter = false;
     muted = false;
     setVolume(0);
@@ -19,9 +18,8 @@ VolumeControl::VolumeControl(const int minVolume, const int maxVolume, const int
     useConverter = false;
 }
 
-VolumeControl::VolumeControl(const int minVolume, const int maxVolume, const int volumeChange, float (*convertNumberFunction)(int), float (*convertDbFunction)(int))
-    : numberOfControls(numberOfControls), minVolume(minVolume), maxVolume(maxVolume), volumeChange(volumeChange), 
-      convertNumberFunction(convertNumberFunction), convertDbFunction(convertDbFunction)
+VolumeControl::VolumeControl(const int minVolume, const int maxVolume, const int volumeChange, float (*convertFunction)(int))
+    : numberOfControls(numberOfControls), minVolume(minVolume), maxVolume(maxVolume), volumeChange(volumeChange), convertFunction(convertFunction)
 {
     useConverter = true;
 }
@@ -99,6 +97,11 @@ int VolumeControl::setGetVolume(int level)
     return getVolume();
 }
 
+float VolumeControl::getVolumeView()
+{
+    return useConverter ? convertFunction(getVolume()) : getVolume();
+}
+
 int VolumeControl::getBalance() { return balanceLevel; }
 
 void VolumeControl::setBalance(int level)
@@ -147,13 +150,3 @@ void VolumeControl::unmute()
 
 void VolumeControl::flipMute() { isMuted() ? unmute() : mute(); }
 bool VolumeControl::isMuted() { return muted; }
-
-float VolumeControl::getVolumeNumber()
-{
-    return useConverter ? convertNumberFunction(getVolume()) : getVolume();
-}
-
-float VolumeControl::getVolumeDb()
-{
-    return useConverter ? convertDbFunction(getVolume()) : getVolume();
-}

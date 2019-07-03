@@ -21,17 +21,16 @@ private:
 
     StereoVolume* volume[6];
 
+    bool useConverter;
+    float(*convertFunction)(int);
+
     int getRightLevel();
     int getLeftLevel();
-
-    bool useConverter;
-    float(*convertNumberFunction)(int);
-    float(*convertDbFunction)(int);
 
 public:
     VolumeControl();
     VolumeControl(const int minVolume, const int maxVolume, const int volumeChange);
-    VolumeControl(const int minVolume, const int maxVolume, const int volumeChange, float(*convertNumberFunction)(int), float(*convertDbFunction)(int));
+    VolumeControl(const int minVolume, const int maxVolume, const int volumeChange, float(*convertFunction)(int));
 
     void begin(StereoVolume* volume1);
     void begin(StereoVolume* volume1, StereoVolume* volume2);
@@ -48,8 +47,7 @@ public:
     void setVolume(int level);
     int setGetVolume(int level);
 
-    float getVolumeNumber();
-    float getVolumeDb();
+    float getVolumeView();
 
     int getBalance();
     void setBalance(int level);
