@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <IRremote.h>
 #include "LcdDisplay.h"
 #include "Button.h"
 #include "RotaryEncoder.h"
@@ -39,6 +40,9 @@ const int AMPC_VOLUME_MAX_VOLUME = 192;
 const int AMPC_VOLUME_CHANGE_BY = 1;
 const int AMPC_BUTTON_MUTE = PIN7;
 
+// IR Receiver
+const int AMPC_IRRECEIVER_PIN = 11;
+
 // Global variables
 LcdDisplay display = LcdDisplay(AMPC_LCD_COLS, AMPC_LCD_ROWS, AMPC_LCD_CHARSIZE);
 
@@ -52,8 +56,11 @@ RotaryEncoder encoder = RotaryEncoder(AMPC_ENCODER_PINA, AMPC_ENCODER_PINB, AMPC
 VolumeControl volume = VolumeControl(AMPC_VOLUME_MIN_VOLUME, AMPC_VOLUME_MAX_VOLUME, AMPC_VOLUME_CHANGE_BY, &convertVolumeToNumber);
 Pga23xx pgaVolume = Pga23xx(AMPC_VOLUME_PIN_SS, AMPC_VOLUME_PIN_SCK, AMPC_VOLUME_PIN_MOSI, "Bass");
 
+IRrecv irReceiver = IRrecv(AMPC_IRRECEIVER_PIN);
+
 float prevVolumeLevel = 0;
 int prevMute;
+decode_results irResults;
 
 void setup()
 {
@@ -65,6 +72,8 @@ void setup()
     delay(1000);
     display.print(0, 0, "Volume:         ");
     display.print(8, 0, String(volume.getVolume()) + " ");
+
+    irReceiver.enableIRIn(); // Start the IR receiver
 
     Serial.begin(115200);
     Serial.println("Setup Ok");
@@ -85,6 +94,12 @@ void loop()
     
     if (muteBtn.checkState() == NORMAL_CLICK)
         volume.flipMute();
+
+    if (irReceiver.decode(&irResults)) {
+        Serial.print("IR Receiver: ");
+        Serial.println(irResults.value, HEX);
+        irReceiver.resume(); // Receive the next value
+    }
 
     if (volume.getVolumeView() != prevVolumeLevel || volume.isMuted() != prevMute)
     {
